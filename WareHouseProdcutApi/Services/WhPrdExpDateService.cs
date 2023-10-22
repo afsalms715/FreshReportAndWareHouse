@@ -52,5 +52,28 @@ namespace WareHouseProdcutApi.Services
             
             return WhProducts;
         }
+
+        public string UpdateExpDate(long Barcode,DateTime date)
+        {
+            using (OracleConnection connection = new OracleConnection(connectionString))
+            {
+                connection.Open();
+                string stringDate = date.ToString("dd-MMM-yy");
+                string Query = "UPDATE OWN_BRAND_EXPIRY_DATE SET OB_EXP_DATE='" + stringDate + "' WHERE OB_BARCODE=" + Barcode + "";
+                try
+                {
+                    using (OracleCommand cmd = new OracleCommand(Query, connection))
+                    {
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    return ex.Message;
+                }
+
+                return "OK";
+            }
+        }
     }
 }

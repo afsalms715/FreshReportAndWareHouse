@@ -19,8 +19,7 @@ namespace WareHouseProdcutApi.Controllers
             this.services = service;
         }
 
-        [Route("Products")]
-        [HttpGet]
+        [HttpGet("Products")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -28,7 +27,8 @@ namespace WareHouseProdcutApi.Controllers
         {
             if (product == 0)
             {
-                return BadRequest();
+                ModelState.AddModelError("Product", "Invalid value you Entered Please Check the value your input");//costom error message
+                return BadRequest(ModelState);
             }
             var result = services.GetWhProducts(product);
             if (result.Count==0)
@@ -36,6 +36,33 @@ namespace WareHouseProdcutApi.Controllers
                 return NotFound();
             }
             return Ok(result);
+        }
+
+        [HttpPatch("UpdateExpDate")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public IActionResult UpdateExpDate(long barcode, string updateDate)
+        {
+            DateTime Date;
+            string msg;
+            if (barcode == 0 || updateDate=="")
+            {
+                return BadRequest();
+            }
+            if(DateTime.TryParse(updateDate, out Date)){
+                msg=services.UpdateExpDate(barcode, Date);
+            }
+            else
+            {
+                ModelState.AddModelError("Date", "Invalid date ");
+                return BadRequest(ModelState);
+            }
+            if (msg=="OK")
+            {
+                return NoContent();
+            }
+            return StatusCode(500,msg);
         }
     }
 }
