@@ -38,6 +38,13 @@ namespace WareHouseProdcutApi
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "WareHouseProdcutApi", Version = "v1" });
             });
+            services.AddCors(options =>
+            {
+                options.AddPolicy("MyCorePolicy", builder =>
+                {
+                    builder.WithOrigins("http://192.168.51.26:86", "http://localhost:3000").AllowAnyMethod().AllowAnyHeader();
+                });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -53,6 +60,8 @@ namespace WareHouseProdcutApi
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseCors("MyCorePolicy");
 
             app.UseAuthorization();
 

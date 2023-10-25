@@ -71,8 +71,34 @@ namespace WareHouseProdcutApi.Services
                 {
                     return ex.Message;
                 }
-
+                connection.Close();
                 return "OK";
+            }
+        }
+
+        public Users UserLogin(string user_id,string password)
+        {
+            using(OracleConnection connection=new OracleConnection(connectionString))
+            {
+                Users user = new Users();
+                connection.Open();
+                string query = "SELECT USER_ID,USER_PASSWORD FROM MMGR_USERS WHERE USER_ID='" + user_id + "' AND USER_PASSWORD='" + password + "'";
+                using(OracleCommand cmd =new OracleCommand(query, connection))
+                {
+                    using(OracleDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.HasRows)
+                        {
+                            while (reader.Read())
+                            {
+                                user.USER_ID = reader["USER_ID"].ToString();
+                                user.USER_PASSWORD = reader["USER_PASSWORD"].ToString();
+                            }
+                        }
+                    }
+                }
+                connection.Close();
+                return user;
             }
         }
     }

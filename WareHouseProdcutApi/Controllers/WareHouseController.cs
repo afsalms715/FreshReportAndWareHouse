@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,7 @@ namespace WareHouseProdcutApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [EnableCors("MyCorePolicy")]
     public class WareHouseController : ControllerBase
     {
         public readonly WhPrdExpDateService services;
@@ -63,6 +65,22 @@ namespace WareHouseProdcutApi.Controllers
                 return NoContent();
             }
             return StatusCode(500,msg);
+        }
+
+        [HttpGet("login")]
+
+        public ActionResult<Users> UserLogin(string User_id,string Password)
+        {
+            if (User_id == ""||Password=="")
+            {
+                return BadRequest();
+            }
+            Users user=services.UserLogin(User_id, Password);
+            if (user.USER_ID!=User_id)
+            {
+                return NotFound();
+            }
+            return user;
         }
     }
 }
