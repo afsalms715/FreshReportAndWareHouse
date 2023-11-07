@@ -1,6 +1,6 @@
 using System;
 
-namespace WareHouseProdcutApi
+namespace FRESH_INV_REPORT_API
 {
     public class WeatherForecast
     {

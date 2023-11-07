@@ -21,12 +21,12 @@ namespace WareHouseProdcutApi.Services
             using(OracleConnection connection=new OracleConnection(connectionString))
             {
                 connection.Open();
-                string query = @"SELECT A.*,
+                string query = @"SELECT OB_BARCODE, OB_PROD, OB_SU, OB_EXP_DATE,
                                         (SELECT SU_DESCRIPTION FROM GRAND_PRD_MASTER_FULL_NEW WHERE BARCODE=OB_BARCODE)SU_DESCRIPTION
                                 FROM
                                     OWN_BRAND_EXPIRY_DATE A 
                                 WHERE 
-                                     OB_BARCODE LIKE '%"+ product + @"%' OR 
+                                     OB_BARCODE LIKE '%" + product + @"%' OR 
                                      OB_PROD LIKE '%"+product+"%'";
                 using(OracleCommand cmd=new OracleCommand(query, connection))
                 {
