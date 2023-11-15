@@ -34,6 +34,10 @@ namespace FRESH_INV_REPORT_API
             {
                 return new FreshReportServices(connectionString);
             });
+            services.AddScoped<NetMovementServices>(provider =>
+            {
+                return new NetMovementServices(connectionString);
+            });
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "FRESH_INV_REPORT_API", Version = "v1" });
