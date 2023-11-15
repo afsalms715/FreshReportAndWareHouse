@@ -23,7 +23,10 @@ namespace FRESH_INV_REPORT_API.Controllers
         [HttpGet("openingId")]
         public ActionResult<IEnumerable<OpeningInvDtl>> GetOpeningDtl(string FromDate,string LocCode)
         {
-            
+            if (FromDate =="" || LocCode=="")
+            {
+                return BadRequest();
+            }
             var openingInvDtl = Services.GetOpeningInvId(FromDate, LocCode);
             return openingInvDtl;
         }

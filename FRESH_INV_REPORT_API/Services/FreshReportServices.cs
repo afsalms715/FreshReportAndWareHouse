@@ -28,12 +28,13 @@ namespace FRESH_INV_REPORT_API.Services
             List<OpeningInvDtl> ListOfopeningInvDtl = new List<OpeningInvDtl>();
             using(OracleConnection connection=new OracleConnection(connectionString))
             {
+                string FormatedFromDate = GetFormatedDate(fromDate);
                 string query = @"SELECT DISTINCT INV_NO,
                                     CASE
                                         WHEN SUBSTR(HIERARCHY, 1, 9) = '1_1S_1S03' THEN 'FRESH'
                                     END AS CATEGORY
                                 FROM GOLDPROD.GRAND_INV_DETL_02@GOLD_SERVER
-                                WHERE INV_DATE ='"+fromDate+@"' AND INV_SITE ="+loc+@"
+                                WHERE INV_DATE ='"+ FormatedFromDate + @"' AND INV_SITE ="+loc+@"
                                 AND SUBSTR(HIERARCHY, 1, 9) = '1_1S_1S03'";
                 connection.Open();
                 using(OracleCommand cmd=new OracleCommand(query, connection))
@@ -48,7 +49,6 @@ namespace FRESH_INV_REPORT_API.Services
                                 openingInvDtl.OpeningInvId = int.Parse(reader["INV_NO"].ToString());
                                 openingInvDtl.Category = reader["CATEGORY"].ToString();
                                 ListOfopeningInvDtl.Add(openingInvDtl);
-                                return ListOfopeningInvDtl;
                             }
                         }
                     }
