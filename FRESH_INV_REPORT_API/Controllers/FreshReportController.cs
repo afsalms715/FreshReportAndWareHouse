@@ -39,10 +39,16 @@ namespace FRESH_INV_REPORT_API.Controllers
         }
 
         [HttpGet("InventoInvDtl")]
-        public ActionResult<InventoInvDtl> GetInventoInvDtl(string ToDate,string LocCode)
+        public ActionResult<IEnumerable<InventoInvDtl>> GetInventoInvDtl(string ToDate,string LocCode)
         {
-            InventoInvDtl inventoInvDtl= Services.GetInventoInvDtl(ToDate, LocCode);
-            return inventoInvDtl;
+            var inventoInvDtls= Services.GetInventoInvDtl(ToDate, LocCode);
+            return inventoInvDtls;
+        }
+
+        [HttpGet("ExcelGeneration")]
+        public void ExcelGeneration()
+        {
+            Services.ExcelGeneration();
         }
 
         [HttpGet("dateFormate")]

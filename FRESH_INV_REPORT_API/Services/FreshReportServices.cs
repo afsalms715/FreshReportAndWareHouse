@@ -5,6 +5,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using FRESH_INV_REPORT_API.Models;
 using System.Globalization;
+using OfficeOpenXml;
+using System.IO;
 
 namespace FRESH_INV_REPORT_API.Services
 {
@@ -58,7 +60,7 @@ namespace FRESH_INV_REPORT_API.Services
             return ListOfopeningInvDtl;
         }
 
-        //GET IVISION INVENTRY ID AND CLOSING INV ID
+        //GET CLOSING INV ID
         public List<ClosingDtl> GetClosingInvDtl(string ToDate,string LocCode)
         {
             List<ClosingDtl> ListOfclosingDtl = new List<ClosingDtl>();
@@ -97,9 +99,10 @@ namespace FRESH_INV_REPORT_API.Services
         }
 
         //get Invento Inventory Details
-        public InventoInvDtl GetInventoInvDtl(string ToDate, string LocCode)
+        public List<InventoInvDtl> GetInventoInvDtl(string ToDate, string LocCode)
         {
-            InventoInvDtl inventoInvDtl = new InventoInvDtl();
+            
+            List<InventoInvDtl> inventoInvDtls = new List<InventoInvDtl>();
             using (OracleConnection connection = new OracleConnection(connectionString))
             {
                 string FormatedToDate = GetFormatedDate(ToDate);
@@ -113,15 +116,76 @@ namespace FRESH_INV_REPORT_API.Services
                         {
                             while (reader.Read())
                             {
+                                InventoInvDtl inventoInvDtl = new InventoInvDtl();
                                 inventoInvDtl.InventoInvId = int.Parse(reader["INVH_NO"].ToString());
                                 inventoInvDtl.InventoInvName = reader["INVH_INV_NAME"].ToString();
+                                inventoInvDtls.Add(inventoInvDtl);
                             }
                         }
                     }
                 }
                 connection.Close();
             }
-            return inventoInvDtl;
+            return inventoInvDtls;
+        }
+
+        //testing generation excel
+        public void ExcelGeneration()
+        {
+            List<ExcelDemo> ExcelDatas = new List<ExcelDemo>();
+            using(OracleConnection connection =new OracleConnection(connectionString))
+            {
+                string query = @"SELECT LOCATION_ID, SECTION_CODE, SECTION_NAME, SALE FROM AFSAL_TEMP";
+                connection.Open();
+                using(OracleCommand cmd=new OracleCommand(query, connection))
+                {
+                    using(OracleDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.HasRows)
+                        {
+                            while (reader.Read())
+                            {
+                                ExcelDemo excelRow = new ExcelDemo();
+                                excelRow.LocationId = int.Parse(reader["LOCATION_ID"].ToString());
+                                excelRow.SectionCode = reader["SECTION_CODE"].ToString();
+                                excelRow.SectionName = reader["SECTION_NAME"].ToString();
+                                excelRow.Sale = reader["SALE"].ToString();
+                                ExcelDatas.Add(excelRow);
+                            }
+                        }
+                    }
+                }
+                connection.Close();
+                string CurrentDirectry = Environment.CurrentDirectory;
+                string filePath = Path.Combine(CurrentDirectry, "ReportFiles", "ExcelReport" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".xlsx");
+                SaveExcelFile(ExcelDatas, filePath);
+            }
+        }
+
+        //saving file
+        public void SaveExcelFile(List<ExcelDemo> ExcelDatas,string FilePath)
+        {
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            using (var package= new ExcelPackage())
+            {
+                var worksheet = package.Workbook.Worksheets.Add("Sheet1");
+                worksheet.Cells[1, 1].Value = "LocationId";
+                worksheet.Cells[1, 2].Value = "SectionCode";
+                worksheet.Cells[1, 3].Value = "SectionName";
+                worksheet.Cells[1, 4].Value = "Sale";
+                worksheet.Cells[1, 5].Value = "sale+location";
+                int row = 2;
+                foreach(var data in ExcelDatas)
+                {
+                    worksheet.Cells[row, 1].Value = data.LocationId;
+                    worksheet.Cells[row, 2].Value = data.SectionCode;
+                    worksheet.Cells[row, 3].Value = data.SectionName;
+                    worksheet.Cells[row, 4].Value = data.Sale;
+                    worksheet.Cells[row, 5].Value = data.Sale + data.LocationId;
+                    row++;
+                }
+                File.WriteAllBytes(FilePath, package.GetAsByteArray());
+            }
         }
     }
 }
