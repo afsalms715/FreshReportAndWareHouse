@@ -181,7 +181,7 @@ namespace FRESH_INV_REPORT_API.Services
                     worksheet.Cells[row, 2].Value = data.SectionCode;
                     worksheet.Cells[row, 3].Value = data.SectionName;
                     worksheet.Cells[row, 4].Value = data.Sale;
-                    worksheet.Cells[row, 5].Value = data.Sale + data.LocationId;
+                    worksheet.Cells["E"+row.ToString()].Formula ="A"+ row.ToString()+"&"+ "B" + row.ToString();
                     row++;
                 }
                 File.WriteAllBytes(FilePath, package.GetAsByteArray());
