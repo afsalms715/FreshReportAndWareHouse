@@ -45,10 +45,13 @@ namespace FRESH_INV_REPORT_API.Controllers
             return inventoInvDtls;
         }
 
-        [HttpGet("ExcelGeneration")]
-        public void ExcelGeneration()
+        [HttpGet("FreshReportGeneration")]
+        public string FreshReportGeneration(string Location,string OpenInvId,string CloseInvId,string InventoInvId,string Sections,string FromDate,string ToDate)
         {
-            Services.ExcelGeneration();
+            string details = "Loc:" + Location + ",OInv:"+ OpenInvId + ",Clinv:"+ CloseInvId + ",IvNo:"+ InventoInvId + ",sections:"+ Sections + @",fromdate:"+FromDate+"," +
+                @"toDate:"+ ToDate + "";
+            return details;
+            //Services.ExcelGeneration();
         }
 
         [HttpGet("dateFormate")]
