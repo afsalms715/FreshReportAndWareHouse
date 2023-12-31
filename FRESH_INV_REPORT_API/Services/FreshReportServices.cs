@@ -190,7 +190,7 @@ namespace FRESH_INV_REPORT_API.Services
         {
             string query = @"SELECT
                                 PRODUCT_CODE,
-                                SU,BARCODE,
+                                SU,NVL(BARCODE,0)BARCODE,
                                 STOCK_UNIT,
                                 SECTION,
                                 SU_DESC,
@@ -223,7 +223,7 @@ namespace FRESH_INV_REPORT_API.Services
                                     GET_SU_DESC(PRODUCT_CODE,SU) SU_DESC,
                                     --
                                     (SELECT MAX(NVL(PHY,0)) FROM GOLDPROD.GRAND_INV_DETL_01@GOLD_SERVER
-                                    WHERE INV_SITE="+ Location + @" AND INV_NO="+ OpenInvId + @" AND ART_CODE=A.PRODUCT_CODE AND ART_SU=A.SU) OPENING_QTY,
+                                    WHERE INV_SITE=" + Location + @" AND INV_NO="+ OpenInvId + @" AND ART_CODE=A.PRODUCT_CODE AND ART_SU=A.SU) OPENING_QTY,
                                     --
                                     (SELECT MAX(NVL(PHY,0)*NVL(STOCK_PP,0)) FROM GOLDPROD.GRAND_INV_DETL_01@GOLD_SERVER
                                     WHERE INV_SITE=" + Location + @" AND INV_NO=" + OpenInvId + @" AND ART_CODE=A.PRODUCT_CODE AND ART_SU=A.SU) OPENING_VAL,
@@ -269,7 +269,7 @@ namespace FRESH_INV_REPORT_API.Services
         //saving file
         public void SaveExcelFile(List<ExcelDemo> ExcelDatas,string FilePath)
         {
-            //HOT FOOD INDUSTRIAL --HOT FOOD
+            //HOT FOOD INDUSTRIAL \\HOT FOOD INHOUSE --HOT FOOD
             //FRUITS  AND  VEGETABLES(W)
             //FISHERY (W)
             //BUTCHERY (W)
@@ -284,7 +284,7 @@ namespace FRESH_INV_REPORT_API.Services
             //split as sections
             foreach (var data in ExcelDatas)
             { 
-                if(data.SECTION== "HOT FOOD INDUSTRIAL")
+                if(data.SECTION== "HOT FOOD INDUSTRIAL" || data.SECTION == "HOT FOOD INHOUSE")
                 {
                    Hot_food.Add(data);
                 }
@@ -314,7 +314,7 @@ namespace FRESH_INV_REPORT_API.Services
             {
                 if (Hot_food.Count != 0)
                 {
-                    var worksheet = package.Workbook.Worksheets.Add("HOT FOOD INDUSTRIAL");
+                    var worksheet = package.Workbook.Worksheets.Add("HOT FOOD ");
                     SheetCreation(worksheet, Hot_food);
                 }
                 if (Fruits_And_veg.Count != 0)
